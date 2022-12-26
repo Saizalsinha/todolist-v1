@@ -3,29 +3,25 @@ const bodyParser = require("body-parser");
 
 const app = express();
 
+var items = ["Buy Food", "Cook Food", "Eat Food"];
+
+app.use(bodyParser.urlencoded({extended:true}));
+
 app.set('view engine', 'ejs');
 
 app.get("/", function (req, res) {
   var today = new Date();
-  var currentDate = today.getDay();
-  var day = "";
-  if (currentDate === 0) {
-    day = "sunday";
-  } else if (currentDate === 1) {
-    day = "Monday";
-  } else if (currentDate === 2) {
-    day = "Tuesday";
-  } else if (currentDate === 3) {
-    day = "Wednesday";
-  } else if (currentDate === 4) {
-    day = "Thursday";
-  } else if (currentDate === 5) {
-    day = "Friday";
-  } else if (currentDate === 6) {
-    day = "Saturday";
-  }
+  // var currentDate = today.getDay();
+  var options = {weekday:'long', day:'numeric', month: 'long'};
+  var day = today.toLocaleDateString('en-US',options);
 
-  res.render('list',{listOfDay:day});
+  res.render('list',{listOfDay:day,newListItem:items});
+});
+
+app.post("/", function(req,res){
+  var item = req.body.newItem;
+  items.push(item);
+  res.redirect("/");
 });
 
 app.listen(3000, function () {

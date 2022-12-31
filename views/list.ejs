@@ -5,10 +5,12 @@
 
 <div class="box">
   <%for(var i = 0;i<newListItem.length;i++){%>
-  <div class="item">
-    <input type="checkbox">
-    <p><%=newListItem[i].name%></p>
-  </div>
+    <form action="/delete" method="post">
+      <div class="item">
+        <input onChange="this.form.submit()" name="checkbox" value="<%= newListItem[i]._id %>" type="checkbox">
+        <p><%=newListItem[i].name%></p>
+      </div>
+    </form>
   <%}%>
     <form class="item" action = "/" method = "post">
       <input type="text" name="newItem" placeholder="New Item" autocomplete="off">

@@ -28,7 +28,13 @@ const itemsSchema = new mongoose.Schema({
   name: String
 });
 
+const listSchema = new mongoose.Schema({
+  name: String,
+  items: [itemsSchema]
+});
+
 const Item = mongoose.model("Item", itemsSchema);
+const List = mongoose.model("List",listSchema);
 
 const item1 = new Item({
   name: "Buy Food"
@@ -73,6 +79,37 @@ app.get("/", function(req, res) {
 
 });
 
+app.get("/:customListName",function(req,res){
+  const customListName = req.params.customListName;
+
+  List.findOne({name:customListName},function(err,foundList){
+    if(!err){
+      if(!foundList){
+        const item = new List({
+          name:customListName,
+          items: defaultItems
+        });
+
+        item.save();
+
+        res.redirect("/" + customListName);
+      } else{
+        res.render("list",{
+          listTitle: foundList.name,
+          newListItem: foundList.items
+        });
+      }
+    }
+  });
+
+
+
+});
+
+app.get("/about", function(req, res) {
+  res.render('about');
+});
+
 app.post("/", function(req, res) {
   // console.log(req.body);
   const itemName = req.body.newItem;
@@ -84,13 +121,6 @@ app.post("/", function(req, res) {
   newItem.save();
 
   res.redirect("/");
-  // if (req.body.list === "Work") {
-  //   workItems.push(item);
-  //   res.redirect("/work");
-  // } else {
-  //   items.push(item);
-  //   res.redirect("/");
-  // }
 
 });
 
@@ -100,17 +130,6 @@ app.post("/delete",function(req,res){
     if(err) console.log(err);
   });
   res.redirect("/");
-});
-
-app.get("/work", function(req, res) {
-  res.render('list', {
-    listTitle: "Work List",
-    newListItem: workItems
-  });
-});
-
-app.get("/about", function(req, res) {
-  res.render('about');
 });
 
 app.listen(3000, function() {

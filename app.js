@@ -44,11 +44,6 @@ const item3 = new Item({
 
 const defaultItems = [item1, item2, item3];
 
-// Item.insertMany(defaultItems, function(err) {
-//   if (err) console.log(err);
-//   else console.log("Success");
-// });
-
 app.set('view engine', 'ejs');
 
 app.get("/", function(req, res) {
@@ -62,24 +57,40 @@ app.get("/", function(req, res) {
   var day = today.toLocaleDateString('en-US', options);
 
   Item.find({}, function(err, foundItems) {
-    res.render('list', {
-      listTitle: day,
-      newListItem: foundItems
-    });
+    if (foundItems.length === 0) {
+      Item.insertMany(defaultItems, function(err) {
+        if (err) console.log(err);
+        else console.log("Success");
+      });
+      res.redirect("/");
+    } else {
+      res.render('list', {
+        listTitle: day,
+        newListItem: foundItems
+      });
+    }
   });
 
 });
 
 app.post("/", function(req, res) {
   // console.log(req.body);
-  var item = req.body.newItem;
-  if (req.body.list === "Work") {
-    workItems.push(item);
-    res.redirect("/work");
-  } else {
-    items.push(item);
-    res.redirect("/");
-  }
+  const itemName = req.body.newItem;
+
+  const newItem = new Item({
+    name: itemName
+  });
+
+  newItem.save();
+
+  res.redirect("/");
+  // if (req.body.list === "Work") {
+  //   workItems.push(item);
+  //   res.redirect("/work");
+  // } else {
+  //   items.push(item);
+  //   res.redirect("/");
+  // }
 
 });
 

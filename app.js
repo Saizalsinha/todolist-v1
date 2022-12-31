@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const date = require(__dirname + "/date.js");
 
 const app = express();
 
@@ -53,14 +54,8 @@ const defaultItems = [item1, item2, item3];
 app.set('view engine', 'ejs');
 
 app.get("/", function(req, res) {
-  var today = new Date();
-  // var currentDate = today.getDay();
-  var options = {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long'
-  };
-  var day = today.toLocaleDateString('en-US', options);
+  
+  const day = date.getDate();
 
   Item.find({}, function(err, foundItems) {
     if (foundItems.length === 0) {
